@@ -34,6 +34,10 @@ This project is designed for:
 
 ### Prerequisites
 
+You need **aipipe token from IITM**
+
+Or
+
 You need an **OpenRouter API token** to use this tool.
 
 1. Sign up at [OpenRouter](https://openrouter.ai/)
