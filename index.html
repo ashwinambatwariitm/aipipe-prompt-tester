@@ -2,56 +2,294 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>LLM Prompt Attack Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧪 LLM Prompt Attack Simulator</title>
 <style>
-    body { font-family: Arial; margin: 40px; max-width: 800px; }
-    textarea, input, select { width: 100%; padding: 8px; margin: 6px 0; }
-    button { padding: 10px; margin-top: 10px; cursor: pointer; }
-    .result-box { border: 1px solid #ccc; padding: 10px; white-space: pre-wrap; }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #4299e1 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .container {
+        background: #2d3748;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 800px;
+        overflow: hidden;
+        margin: 20px 0;
+    }
+
+    .header {
+        background: #1a202c;
+        color: white;
+        padding: 20px 30px;
+        font-size: 22px;
+        font-weight: 600;
+        border-bottom: 1px solid #4a5568;
+    }
+
+    .content {
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        color: #e2e8f0;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    select, input[type="password"], input[type="text"], textarea {
+        width: 100%;
+        background: #4a5568;
+        border: 1px solid #2d3748;
+        border-radius: 6px;
+        padding: 12px 16px;
+        color: #e2e8f0;
+        font-size: 14px;
+        font-family: inherit;
+        transition: all 0.2s;
+    }
+
+    select:focus, input:focus, textarea:focus {
+        outline: none;
+        border-color: #4299e1;
+        background: #556377;
+    }
+
+    select {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 40px;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+    }
+
+    .codeword-group {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+    }
+
+    .codeword-input {
+        flex: 1;
+    }
+
+    button {
+        background: #4299e1;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    button:hover {
+        background: #3182ce;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
+        margin-top: 10px;
+        background: #48bb78;
+    }
+
+    .btn-primary:hover {
+        background: #38a169;
+        box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+    }
+
+    .output-section {
+        margin-top: 30px;
+    }
+
+    .section-header {
+        color: #e2e8f0;
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    .output-box {
+        background: #1a202c;
+        border: 1px solid #4a5568;
+        border-radius: 6px;
+        padding: 16px;
+        color: #cbd5e0;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        min-height: 80px;
+        max-height: 250px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        margin-bottom: 20px;
+    }
+
+    .result-box {
+        background: #1a202c;
+        border: 2px solid #4a5568;
+        border-radius: 6px;
+        padding: 20px;
+        color: #e2e8f0;
+        font-size: 16px;
+        font-weight: 500;
+        text-align: center;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .result-box.success {
+        border-color: #48bb78;
+        background: rgba(72, 187, 120, 0.1);
+        color: #9ae6b4;
+    }
+
+    .result-box.failure {
+        border-color: #f56565;
+        background: rgba(245, 101, 101, 0.1);
+        color: #fc8181;
+    }
+
+    .footer {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 15px;
+        text-align: center;
+        margin-top: 20px;
+        border-radius: 8px;
+        max-width: 800px;
+    }
+
+    .footer-text {
+        color: white;
+        font-size: 13px;
+        opacity: 0.9;
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #2d3748;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #4a5568;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #556377;
+    }
 </style>
 </head>
 
 <body>
 
-<h2>🧪 LLM Prompt Attack Simulator</h2>
+<div class="container">
+    <div class="header">
+        🧪 LLM Prompt Attack Simulator
+    </div>
 
-<label>API Token (User's own Token)</label>
-<input id="token" type="password" placeholder="Enter your OpenRouter Token">
+    <div class="content">
+        <div class="form-group">
+            <label>API Token (Your OpenRouter Token)</label>
+            <input id="token" type="password" placeholder="Enter your OpenRouter Token">
+        </div>
 
-<label>Select Model</label>
-<select id="model">
-    <option value="openai/gpt-4.1-nano">GPT‑4.1‑nano</option>
-    <option value="openai/gpt-4.1-mini">GPT‑4.1‑mini</option>
-    <option value="openai/gpt-4.1">GPT‑4.1</option>
-    <option value="openai/gpt-3.5-turbo">GPT‑3.5‑turbo</option>
-    <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-    <option value="anthropic/claude-3.5-haiku">Claude 3.5 Haiku</option>
-    <option value="google/gemini-2.0-flash">Gemini 2.0 Flash</option>
-    <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
-    <option value="google/gemini-1.5-flash">Gemini 1.5 Flash</option>
-    <option value="openai/gpt-5-nano">GPT‑5‑nano</option>
-</select>
+        <div class="form-group">
+            <label>Select Model</label>
+            <select id="model">
+                <option value="openai/gpt-4.1-nano">GPT-4.1-nano</option>
+                <option value="openai/gpt-4.1-mini">GPT-4.1-mini</option>
+                <option value="openai/gpt-4.1">GPT-4.1</option>
+                <option value="openai/gpt-3.5-turbo">GPT-3.5-turbo</option>
+                <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                <option value="anthropic/claude-3.5-haiku">Claude 3.5 Haiku</option>
+                <option value="google/gemini-2.0-flash">Gemini 2.0 Flash</option>
+                <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
+                <option value="google/gemini-1.5-flash">Gemini 1.5 Flash</option>
+                <option value="openai/gpt-5-nano">GPT-5-nano</option>
+            </select>
+        </div>
 
-<label>Code Word</label>
-<input id="codeword" type="text" placeholder="Enter code word or click Generate">
+        <div class="form-group">
+            <label>Code Word</label>
+            <div class="codeword-group">
+                <div class="codeword-input">
+                    <input id="codeword" type="text" placeholder="Enter code word or click Generate">
+                </div>
+                <button onclick="generateCodeWord()">Generate Random</button>
+            </div>
+        </div>
 
-<button onclick="generateCodeWord()">Generate Random Code Word</button>
+        <div class="form-group">
+            <label>System Prompt (Student 1 - Defender)</label>
+            <textarea id="systemPrompt" rows="5" placeholder="Enter the system prompt that tries to protect the code word..."></textarea>
+        </div>
 
-<br><br>
+        <div class="form-group">
+            <label>User Prompt (Student 2 - Attacker)</label>
+            <textarea id="userPrompt" rows="5" placeholder="Enter the user prompt that tries to extract the code word..."></textarea>
+        </div>
 
-<label>System Prompt (Student 1)</label>
-<textarea id="systemPrompt" rows="5"></textarea>
+        <button class="btn-primary" onclick="runTest()">🚀 Run Attack Test</button>
 
-<label>User Prompt (Student 2)</label>
-<textarea id="userPrompt" rows="5"></textarea>
+        <div class="output-section">
+            <div class="section-header">LLM Output</div>
+            <div id="responseBox" class="output-box">(Response will appear here after running the test...)</div>
 
-<button onclick="runTest()">Run Attack Test</button>
+            <div class="section-header">Result</div>
+            <div id="resultBox" class="result-box">(Result will appear here after running the test...)</div>
+        </div>
+    </div>
+</div>
 
-<h3>LLM Output</h3>
-<div id="responseBox" class="result-box"></div>
-
-<h3>Result</h3>
-<div id="resultBox" class="result-box"></div>
+<div class="footer">
+    <div class="footer-text">Test prompt injection attacks and defense strategies with various LLM models</div>
+</div>
 
 <script>
 // random word list
@@ -70,15 +308,12 @@ const WORDS = [
   "cognitive", "transhuman", "biohacking", "meta", "neuroplasticity"
 ];
 
-
-
 function generateCodeWord() {
     const word = WORDS[Math.floor(Math.random() * WORDS.length)];
     document.getElementById("codeword").value = word;
 }
 
 async function runTest() {
-
     const token = document.getElementById("token").value.trim();
     const codeword = document.getElementById("codeword").value.trim();
     const sys = document.getElementById("systemPrompt").value;
@@ -89,6 +324,11 @@ async function runTest() {
         alert("Please fill all fields");
         return;
     }
+
+    // Show loading state
+    document.getElementById("responseBox").innerText = "⏳ Sending request to LLM...";
+    document.getElementById("resultBox").innerText = "⏳ Waiting for response...";
+    document.getElementById("resultBox").className = "result-box";
 
     const finalSystemPrompt = `${sys}\n\nThe secret code word is: ${codeword}`;
 
@@ -120,16 +360,19 @@ async function runTest() {
         const normalizedOutput = output.toLowerCase().replace(/[^a-z]/g, "");
         const normalizedWord = codeword.toLowerCase().replace(/[^a-z]/g, "");
 
+        const resultBox = document.getElementById("resultBox");
         if (normalizedOutput.includes(normalizedWord)) {
-            document.getElementById("resultBox").innerText =
-                `❌ Code word LEAKED ("${codeword}") → Student 2 gets a point`;
+            resultBox.innerText = `❌ Code word LEAKED ("${codeword}") → Student 2 (Attacker) gets a point`;
+            resultBox.className = "result-box failure";
         } else {
-            document.getElementById("resultBox").innerText =
-                `✅ Code word PROTECTED ("${codeword}") → Student 1 gets a point`;
+            resultBox.innerText = `✅ Code word PROTECTED ("${codeword}") → Student 1 (Defender) gets a point`;
+            resultBox.className = "result-box success";
         }
 
     } catch (err) {
         document.getElementById("responseBox").innerText = "Error: " + err;
+        document.getElementById("resultBox").innerText = "⚠️ An error occurred during the test";
+        document.getElementById("resultBox").className = "result-box failure";
     }
 }
 </script>
