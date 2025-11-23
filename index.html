@@ -55,7 +55,22 @@
 
 <script>
 // random word list
-const WORDS = ["elephant", "tiger", "quantum", "nebula", "starlight", "python", "galaxy", "shadow"];
+const WORDS = [
+  "elephant", "tiger", "quantum", "nebula", "starlight", "python", 
+  "galaxy", "shadow", "ephemeral", "aurora", "cryptic", "labyrinth", 
+  "zenith", "serendipity", "oblivion", "luminous", "chimerical", 
+  "halcyon", "vortex", "solstice", "enigma", "reverie", "cascade",
+  "neural", "algorithm", "blockchain", "cybernetics", "singularity", 
+  "deepfake", "metaverse", "augmented", "autonomous", "generative", 
+  "sentient", "exponential", "matrix", "quantification", "nanotech", 
+  "biometrics", "GPT", "machinelearning", "dystopia", "superintelligence",
+  "hyperreal", "deepmind", "cyberspace", "automata", "synthetic", 
+  "mindware", "quantumcomputing", "AIethics", "neurotechnology", 
+  "robotics", "cloudnative", "dataverse", "algorithmic", "futurism", 
+  "cognitive", "transhuman", "biohacking", "meta", "neuroplasticity"
+];
+
+
 
 function generateCodeWord() {
     const word = WORDS[Math.floor(Math.random() * WORDS.length)];
