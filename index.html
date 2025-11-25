@@ -50,11 +50,18 @@
     }
 
     label {
-        display: block;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         color: #e2e8f0;
         font-size: 14px;
         font-weight: 500;
         margin-bottom: 8px;
+    }
+
+    .char-counter {
+        font-weight: normal;
+        font-size: 13px;
     }
 
     select, input[type="password"], input[type="text"], textarea {
@@ -86,7 +93,7 @@
 
     textarea {
         resize: vertical;
-        min-height: 100px;
+        min-height: 80px;
         font-family: 'Courier New', monospace;
         font-size: 13px;
     }
@@ -266,13 +273,19 @@
         </div>
 
         <div class="form-group">
-            <label>System Prompt (Student 1 - Defender)</label>
-            <textarea id="systemPrompt" rows="5" placeholder="Enter the system prompt that tries to protect the code word..."></textarea>
+            <label>
+                <span>System Prompt (Student 1 - Defender)</span>
+                <span id="systemCount" class="char-counter">100 remaining</span>
+            </label>
+            <textarea id="systemPrompt" rows="3" placeholder="Enter the system prompt that tries to protect the code word..." maxlength="100"></textarea>
         </div>
 
         <div class="form-group">
-            <label>User Prompt (Student 2 - Attacker)</label>
-            <textarea id="userPrompt" rows="5" placeholder="Enter the user prompt that tries to extract the code word..."></textarea>
+            <label>
+                <span>User Prompt (Student 2 - Attacker)</span>
+                <span id="userCount" class="char-counter">100 remaining</span>
+            </label>
+            <textarea id="userPrompt" rows="3" placeholder="Enter the user prompt that tries to extract the code word..." maxlength="100"></textarea>
         </div>
 
         <button class="btn-primary" onclick="runTest()">🚀 Run Attack Test</button>
@@ -313,6 +326,47 @@ function generateCodeWord() {
     document.getElementById("codeword").value = word;
 }
 
+// Character counter functions - showing REMAINING characters
+function updateSystemCounter() {
+    const textarea = document.getElementById("systemPrompt");
+    const counter = document.getElementById("systemCount");
+    const length = textarea.value.length;
+    const remaining = 100 - length;
+    
+    counter.textContent = `${remaining} remaining`;
+    
+    if (remaining === 0) {
+        counter.style.color = "#fc8181"; // Red
+    } else if (remaining <= 20) {
+        counter.style.color = "#f6ad55"; // Orange
+    } else {
+        counter.style.color = "#cbd5e0"; // Gray
+    }
+}
+
+function updateUserCounter() {
+    const textarea = document.getElementById("userPrompt");
+    const counter = document.getElementById("userCount");
+    const length = textarea.value.length;
+    const remaining = 100 - length;
+    
+    counter.textContent = `${remaining} remaining`;
+    
+    if (remaining === 0) {
+        counter.style.color = "#fc8181"; // Red
+    } else if (remaining <= 20) {
+        counter.style.color = "#f6ad55"; // Orange
+    } else {
+        counter.style.color = "#cbd5e0"; // Gray
+    }
+}
+
+// Add event listeners for character counting
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById("systemPrompt").addEventListener('input', updateSystemCounter);
+    document.getElementById("userPrompt").addEventListener('input', updateUserCounter);
+});
+
 async function runTest() {
     const token = document.getElementById("token").value.trim();
     const codeword = document.getElementById("codeword").value.trim();
@@ -322,6 +376,17 @@ async function runTest() {
 
     if (!token || !codeword || !sys || !usr) {
         alert("Please fill all fields");
+        return;
+    }
+
+    // Validate prompt lengths
+    if (sys.length > 100) {
+        alert("System prompt must be 100 characters or less");
+        return;
+    }
+
+    if (usr.length > 100) {
+        alert("User prompt must be 100 characters or less");
         return;
     }
 
