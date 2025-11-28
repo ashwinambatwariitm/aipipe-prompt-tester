@@ -85,20 +85,22 @@
 
     select, input[type="password"], input[type="text"], textarea {
         width: 100%;
-        background: #4a5568;
-        border: 1px solid #2d3748;
+        background: #1a202c;
+        border: 2px solid #4299e1;
         border-radius: 6px;
         padding: 12px 16px;
-        color: #e2e8f0;
+        color: #ffffff;
         font-size: 14px;
         font-family: inherit;
         transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(66, 153, 225, 0.15);
     }
 
     select:focus, input:focus, textarea:focus {
         outline: none;
-        border-color: #4299e1;
-        background: #556377;
+        border-color: #63b3ed;
+        background: #2d3748;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
     }
 
     select {
@@ -353,6 +355,11 @@ const WORDS = [
 function generateCodeWord() {
     const word = WORDS[Math.floor(Math.random() * WORDS.length)];
     document.getElementById("codeword").value = word;
+    
+    // Clear previous results when generating new code word
+    document.getElementById("responseBox").innerText = "(Response will appear here after running the test...)";
+    document.getElementById("resultBox").innerText = "(Result will appear here after running the test...)";
+    document.getElementById("resultBox").className = "result-box";
 }
 
 // Character counter functions - showing REMAINING characters
@@ -390,10 +397,30 @@ function updateUserCounter() {
     }
 }
 
-// Add event listeners for character counting
+// Load saved API token from localStorage
+function loadSavedToken() {
+    const savedToken = localStorage.getItem('apiToken');
+    if (savedToken) {
+        document.getElementById("token").value = savedToken;
+    }
+}
+
+// Save API token to localStorage
+function saveToken() {
+    const token = document.getElementById("token").value.trim();
+    if (token) {
+        localStorage.setItem('apiToken', token);
+    }
+}
+
+// Add event listeners for character counting and token saving
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById("systemPrompt").addEventListener('input', updateSystemCounter);
     document.getElementById("userPrompt").addEventListener('input', updateUserCounter);
+    document.getElementById("token").addEventListener('input', saveToken);
+    
+    // Load saved token on page load
+    loadSavedToken();
 });
 
 async function runTest() {
