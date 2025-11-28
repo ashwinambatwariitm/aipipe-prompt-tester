@@ -475,8 +475,26 @@ async function runTest() {
         });
 
         const data = await response.json();
+        
+        // Enhanced error checking
+        console.log("API Response:", data);
+        
+        if (data.error) {
+            document.getElementById("responseBox").innerText = `API Error: ${data.error.message || JSON.stringify(data.error)}`;
+            document.getElementById("resultBox").innerText = "⚠️ API returned an error - check your token and model";
+            document.getElementById("resultBox").className = "result-box failure";
+            return;
+        }
 
-        const output = data?.choices?.[0]?.message?.content || "(No output)";
+        const output = data?.choices?.[0]?.message?.content || "";
+        
+        if (!output) {
+            document.getElementById("responseBox").innerText = `No output received. Full response: ${JSON.stringify(data)}`;
+            document.getElementById("resultBox").innerText = "⚠️ Model returned empty response";
+            document.getElementById("resultBox").className = "result-box failure";
+            return;
+        }
+        
         document.getElementById("responseBox").innerText = output;
 
         // Check if codeword leaked
@@ -493,8 +511,9 @@ async function runTest() {
         }
 
     } catch (err) {
-        document.getElementById("responseBox").innerText = "Error: " + err;
-        document.getElementById("resultBox").innerText = "⚠️ An error occurred during the test";
+        console.error("Fetch error:", err);
+        document.getElementById("responseBox").innerText = "Error: " + err.message + "\n\nCheck browser console (F12) for details";
+        document.getElementById("resultBox").innerText = "⚠️ Network or API error occurred";
         document.getElementById("resultBox").className = "result-box failure";
     }
 }
